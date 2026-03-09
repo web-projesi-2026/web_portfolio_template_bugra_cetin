@@ -1,4 +1,4 @@
-# web_portfolio_template
+# web_portfolio_template_BUĞRA
 web projesi yönetimi dersi
 [README.md](https://github.com/user-attachments/files/25833993/README.md)
 # 📷 Dış-Mekan-Çekimi
