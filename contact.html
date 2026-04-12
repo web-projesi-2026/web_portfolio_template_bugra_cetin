@@ -6,12 +6,10 @@
   <title>İletişim | Dış-Mekan-Çekimi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-ring" id="cursorRing"></div>
 
   <nav>
     <a href="index.html" class="nav-logo">DIS·MEKAN<span>·CEKİMİ</span></a>
@@ -35,6 +33,196 @@
   <div class="page-header">
     <div>
       <div class="page-tag">Bize Ulaşın</div>
+      <h1 class="page-title">
+        Fikrin mi<br>
+        <em>Var?</em>
+      </h1>
+    </div>
+    <p class="page-desc">
+      Proje hakkında soru, öneri veya<br>
+      işbirliği teklifi için formu doldur.<br>
+      En kısa sürede geri döneceğiz.
+    </p>
+  </div>
+
+  <div class="contact-layout">
+
+    <div class="contact-info">
+      <div>
+        <div class="section-label reveal">İletişim Bilgileri</div>
+
+        <div class="info-item reveal">
+          <div class="info-icon">✉</div>
+          <div class="info-content">
+            <div class="info-label">E-posta</div>
+            <div class="info-value">
+              <a href="mailto:proje@dismekan.com">proje@dismekan.com</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-item reveal">
+          <div class="info-icon">🏛</div>
+          <div class="info-content">
+            <div class="info-label">Kurum</div>
+            <div class="info-value">Web Projesi Yönetimi Dersi</div>
+          </div>
+        </div>
+
+        <div class="info-item reveal">
+          <div class="info-icon">📍</div>
+          <div class="info-content">
+            <div class="info-label">Konum</div>
+            <div class="info-value">Ankara, Türkiye</div>
+          </div>
+        </div>
+
+        <div class="info-item reveal">
+          <div class="info-icon">⏱</div>
+          <div class="info-content">
+            <div class="info-label">Yanıt Süresi</div>
+            <div class="info-value">24–48 saat içinde</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <div class="section-label">Bağlantılar</div>
+        <div class="social-links">
+          <a href="#" class="social-link">
+            <span class="social-name">GitHub</span>
+            <span class="social-arrow">→</span>
+          </a>
+          <a href="#" class="social-link">
+            <span class="social-name">Instagram</span>
+            <span class="social-arrow">→</span>
+          </a>
+          <a href="#" class="social-link">
+            <span class="social-name">LinkedIn</span>
+            <span class="social-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-form-wrap">
+      <h2 class="form-title reveal">Mesaj <em>Gönder</em></h2>
+      <p class="form-subtitle reveal">
+        Tüm alanları doldurarak bize ulaşabilirsin.<br>
+        Spam göndermeyeceğiz, söz.
+      </p>
+
+      <div class="form reveal" id="contactForm">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">Ad</label>
+            <input type="text" id="firstName" placeholder="Adın" />
+          </div>
+          <div class="form-group">
+            <label for="lastName">Soyad</label>
+            <input type="text" id="lastName" placeholder="Soyadın" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">E-posta Adresi</label>
+          <input type="email" id="email" placeholder="ornek@mail.com" />
+        </div>
+
+        <div class="form-group">
+          <label for="subject">Konu</label>
+          <select id="subject">
+            <option value="" disabled selected>Konu seçin...</option>
+            <option value="general">Genel Soru</option>
+            <option value="feature">Özellik Önerisi</option>
+            <option value="bug">Hata Bildirimi</option>
+            <option value="collab">İşbirliği Teklifi</option>
+            <option value="press">Basın & Medya</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="border-bottom: 1px solid var(--border);">
+          <label for="message">Mesajın</label>
+          <textarea id="message" placeholder="Mesajını buraya yaz..."></textarea>
+        </div>
+
+        <div class="form-check-group">
+          <input type="checkbox" id="agree" />
+          <label for="agree">
+            Gönderilen bilgilerin yalnızca bu projeyle ilgili iletişim
+            amacıyla kullanılacağını ve üçüncü taraflarla paylaşılmayacağını kabul ediyorum.
+          </label>
+        </div>
+
+        <div class="form-submit">
+          <button class="btn-submit">Gönder</button>
+          <p class="submit-note">
+            Formu göndererek<br>
+            iletişim politikamızı<br>
+            kabul etmiş olursunuz.
+          </p>
+        </div>
+
+        <div class="success-msg" id="successMsg">
+          ✓ &nbsp; Mesajın başarıyla gönderildi. En kısa sürede geri döneceğiz.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="faq">
+    <div class="section-label reveal">Sık Sorulan Sorular</div>
+    <h2 style="font-size:clamp(30px,3.5vw,48px);font-weight:300;color:var(--light);margin-bottom:0" class="reveal">
+      Merak Ettiklerin
+    </h2>
+    <div class="faq-grid">
+      <div class="faq-item reveal">
+        <div class="faq-q">Platform ücretsiz mi?</div>
+        <div class="faq-a">Evet, platform bir ders projesi olarak geliştirilmiştir ve tamamen ücretsizdir. Ticari amaç taşımamaktadır.</div>
+      </div>
+      <div class="faq-item reveal" style="transition-delay:0.1s">
+        <div class="faq-q">Hangi cihazlarda çalışır?</div>
+        <div class="faq-a">Modern tarayıcı destekleyen tüm cihazlarda çalışır. Mobil uyumlu (responsive) tasarımı sayesinde telefon ve tabletlerde de sorunsuz kullanılabilir.</div>
+      </div>
+      <div class="faq-item reveal" style="transition-delay:0.15s">
+        <div class="faq-q">API anahtarı gerekiyor mu?</div>
+        <div class="faq-a">Mapbox ve SunCalc API entegrasyonu için kişisel API anahtarları gereklidir. Kurulum talimatları README dosyasında açıklanmıştır.</div>
+      </div>
+      <div class="faq-item reveal" style="transition-delay:0.2s">
+        <div class="faq-q">Verilerim güvende mi?</div>
+        <div class="faq-a">Kaydettiğin lokasyon ve notlar yalnızca kendi veritabanında saklanır. Herhangi bir üçüncü tarafla paylaşılmaz.</div>
+      </div>
+      <div class="faq-item reveal" style="transition-delay:0.25s">
+        <div class="faq-q">Projeye katkıda bulunabilir miyim?</div>
+        <div class="faq-a">GitHub üzerinden projeye ulaşarak pull request gönderebilirsin. Her türlü katkıya açığız.</div>
+      </div>
+      <div class="faq-item reveal" style="transition-delay:0.3s">
+        <div class="faq-q">Başka lensler için de öneri var mı?</div>
+        <div class="faq-a">Platform 135mm odaklı olsa da 85mm, 50mm ve 24mm gibi lensler için de ekipman önerileri ve notlar eklenebilmektedir.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>
+      <div class="footer-logo">Dış Mekan Çekimi</div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px">
+        Lokasyon bazlı ışık planlama platformu
+      </div>
+    </div>
+    <ul class="footer-links">
+      <li><a href="index.html">Ana Sayfa</a></li>
+      <li><a href="project.html">Proje</a></li>
+      <li><a href="about.html">Hakkında</a></li>
+      <li><a href="contact.html">İletişim</a></li>
+    </ul>
+    <div class="footer-copy">© 2025 Web Projesi Yönetimi Dersi</div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>      <div class="page-tag">Bize Ulaşın</div>
       <h1 class="page-title">
         Fikrin mi<br>
         <em>Var?</em>
