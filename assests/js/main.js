@@ -505,3 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('%cDış-Mekan-Çekimi', 'color:#d4a843;font-family:serif;font-size:18px;font-style:italic');
   console.log('%cLokasyon bazlı ışık planlama platformu', 'color:#555;font-family:monospace;font-size:10px');
 });
+// Hamburgere tıklayınca menüyü aç/kapat
+hamburger.addEventListener('click', () => {
+  navLinks.classList.toggle('open');
+});
