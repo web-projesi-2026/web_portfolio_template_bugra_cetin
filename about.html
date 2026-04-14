@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -6,447 +7,67 @@
   <title>Hakkında | Dış-Mekan-Çekimi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  <nav>
-    <a href="index.html" class="nav-logo">DIS·MEKAN<span>·CEKİMİ</span></a>
-    
-    <div class="hamburger" id="hamburger">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
+    :root {
+      --black:  #0a0a0a;
+      --dark:   #111111;
+      --mid:    #1c1c1c;
+      --border: #2a2a2a;
+      --muted:  #555;
+      --text:   #c8c0b4;
+      --light:  #e8e0d4;
+      --gold:   #d4a843;
+      --gold2:  #f0c060;
+      --accent: #e87b3a;
+    }
 
-    <ul class="nav-links" id="navLinks">
-      <li><a href="index.html#features">Özellikler</a></li>
-      <li><a href="index.html#nasil">Nasıl Çalışır</a></li>
-      <li><a href="index.html#harita">Harita</a></li>
-      <li><a href="project.html">Proje</a></li>
-      <li><a href="about.html" class="active">Hakkında</a></li>
-      <li><a href="contact.html">İletişim</a></li>
-    </ul>
-  </nav>
+    html { scroll-behavior: smooth; }
+    /* ── LIGHT MODE ── */
+    body.light-mode {
+      --black:   #f5f0e8;
+      --dark:    #ede8dc;
+      --mid:     #e0d8cc;
+      --border:  #c8bfb0;
+      --muted:   #8a7f70;
+      --text:    #3a3028;
+      --light:   #1a1208;
+      --gold:    #b8861e;
+      --gold2:   #d4a030;
+      --accent:  #c05a18;
+    }
+    body.light-mode nav {
+      background: linear-gradient(to bottom, rgba(245,240,232,0.97), transparent);
+    }
+    body.light-mode nav.scrolled { background: rgba(245,240,232,0.99); }
+    body.light-mode .nav-links    { background: rgba(245,240,232,0.98) !important; }
 
-  <div class="page-header">
-    <div class="page-tag">Proje Hakkında</div>
-    <h1 class="page-title">
-      Neden Bu<br>
-      <em>Platform?</em>
-    </h1>
-  </div>
+    /* ── DARK MODE TOGGLE BUTONU ── */
+    .theme-toggle { display:flex; align-items:center; gap:10px; z-index:102; cursor:pointer; background:none; border:none; padding:0; }
+    .theme-toggle-track { width:44px; height:24px; background:var(--border); border-radius:12px; position:relative; transition:background 0.3s; border:1px solid var(--muted); }
+    body.light-mode .theme-toggle-track { background:var(--gold); border-color:var(--gold); }
+    .theme-toggle-thumb { position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:var(--gold); transition:transform 0.3s, background 0.3s; }
+    body.light-mode .theme-toggle-thumb { transform:translateX(20px); background:var(--black); }
+    .theme-toggle-icon { font-size:14px; line-height:1; }
 
-  <section class="intro">
-    <div class="intro-left">
-      <div class="section-label reveal">Motivasyon</div>
-      <h2 class="intro-title reveal">
-        Doğru Işık,<br>
-        <em>Şansa Bırakılmaz</em>
-      </h2>
-      <p class="intro-text reveal">
-        Dar açılı lenslerle — özellikle 135mm F2 gibi sıkıştırma etkisi yüksek objektiflerle — dış mekanda çekim yaparken en büyük zorluk, doğru ışığı ve doğru arka planı aynı anda yakalamaktır.
-      </p>
-      <p class="intro-text reveal">
-        Altın Saat yalnızca gün doğumu ve batımından sonra yaklaşık 45–60 dakika sürer. Bu dar pencereyi verimli kullanmak için çekim yapılacak konumun önceden scouting edilmesi, güneşin tam olarak hangi açıdan geleceğinin bilinmesi ve ekipman seçiminin buna göre yapılması gerekir.
-      </p>
-      <p class="intro-text reveal">
-        Dış-Mekan-Çekimi platformu; bu planlama sürecini harita, ışık hesaplama ve keşif notları ile tek çatı altında toplar.
-      </p>
-    </div>
+    /* ── YUKARI ÇIK BUTONU ── */
+    .scroll-top-btn { position:fixed; bottom:40px; right:40px; z-index:200; width:48px; height:48px; background:var(--gold); color:var(--black); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; font-family:"Space Mono",monospace; clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%); opacity:0; transform:translateY(20px); transition:opacity 0.4s ease, transform 0.4s ease, background 0.3s; pointer-events:none; }
+    .scroll-top-btn.visible { opacity:1; transform:translateY(0); pointer-events:all; }
+    .scroll-top-btn:hover { background:var(--gold2); }
 
-    <div class="intro-right reveal">
-      <div class="stat-block">
-        <div class="stat-big">47'</div>
-        <div class="stat-info">
-          <div class="stat-title">Altın Saat Süresi</div>
-          <div class="stat-desc">Gün doğumu & batımında ortalama<br>kullanılabilir altın ışık penceresi</div>
-        </div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-big">135</div>
-        <div class="stat-info">
-          <div class="stat-title">Odak Uzaklığı (mm)</div>
-          <div class="stat-desc">Portre & otomobil çekimlerinde<br>tercih edilen dar açılı lens</div>
-        </div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-big">f/2</div>
-        <div class="stat-info">
-          <div class="stat-title">Maksimum Diyafram</div>
-          <div class="stat-desc">Sığ alan derinliği &<br>düşük ışık performansı</div>
-        </div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-big">3°</div>
-        <div class="stat-info">
-          <div class="stat-title">Işık Toleransı</div>
-          <div class="stat-desc">Güneş açısındaki küçük değişimin<br>sahnede yarattığı büyük fark</div>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <section class="problem">
-    <div class="section-label reveal">Sorun & Çözüm</div>
-    <h2 class="intro-title reveal">
-      Mevcut Zorluklar &<br>
-      <em>Yaklaşımımız</em>
-    </h2>
-    <div class="two-col reveal">
-      <div class="col-card problem-card">
-        <div class="col-card-label">⚠ Mevcut Sorunlar</div>
-        <h3 class="col-card-title">Saha Çekimlerindeki Güçlükler</h3>
-        <ul>
-          <li>Altın Saat zamanı lokasyona göre değişir, genel uygulamalar yeterince hassas değildir</li>
-          <li>Güneşin hangi yönden geleceği önceden bilinmediği için arka plan & ışık çatışır</li>
-          <li>Çekim notları dağınık — kağıt, telefon notu, fotoğraf arşivi ayrı yerlerde tutulur</li>
-          <li>Her lokasyon için en uygun lens manuel olarak tahmin edilir</li>
-          <li>Geçmiş scouting bilgileri kaybolur veya erişilemez hâle gelir</li>
-        </ul>
-      </div>
-      <div class="col-card solution-card">
-        <div class="col-card-label">✓ Platformumuzun Çözümü</div>
-        <h3 class="col-card-title">Tek Platformda Akıllı Planlama</h3>
-        <ul>
-          <li>SunCalc API ile seçilen GPS koordinatına özel dakika hassasiyetinde altın saat hesabı</li>
-          <li>Güneş yayı ve yön göstergesi ile arka plan & ışık uyumunu önceden görselleştirme</li>
-          <li>Harita pinlerine bağlı notlar, lens tavsiyeleri ve referans fotoğraf arşivi</li>
-          <li>Lokasyon bazında otomatik ekipman önerisi (135mm, 85mm, geniş açı)</li>
-          <li>SQL veritabanında kalıcı olarak saklanan scouting geçmişi</li>
-        </ul>
-      </div>
-    </div>
-  </section>
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      line-height: 1.7;
+      overflow-x: hidden;
+      cursor: none;
+    }
 
-  <section class="lens-section">
-    <div class="section-label reveal">Lens Rehberi</div>
-    <h2 class="intro-title reveal">
-      Doğru Lens,<br>
-      <em>Doğru Konum</em>
-    </h2>
-    <div class="lens-grid reveal">
-      <div class="lens-card featured">
-        <div class="lens-badge">Önerilen</div>
-        <div class="lens-mm">135</div>
-        <div class="lens-aperture">f/2 · Tele Portre</div>
-        <div class="lens-use">Sıkıştırma etkisi & bokeh</div>
-        <div class="lens-tags">
-          <span class="lens-tag">— Portre çekimi</span>
-          <span class="lens-tag">— Otomobil detayı</span>
-          <span class="lens-tag">— Uzak arka plan</span>
-        </div>
-      </div>
-      <div class="lens-card">
-        <div class="lens-mm">85</div>
-        <div class="lens-aperture">f/1.8 · Klasik Portre</div>
-        <div class="lens-use">Dengeli perspektif</div>
-        <div class="lens-tags">
-          <span class="lens-tag">— Yüz çekimi</span>
-          <span class="lens-tag">— Sokak portesi</span>
-          <span class="lens-tag">— Düşük ışık</span>
-        </div>
-      </div>
-      <div class="lens-card">
-        <div class="lens-mm">50</div>
-        <div class="lens-aperture">f/1.4 · Normal</div>
-        <div class="lens-use">İnsan gözü perspektifi</div>
-        <div class="lens-tags">
-          <span class="lens-tag">— Çevre & portre</span>
-          <span class="lens-tag">— Full frame</span>
-          <span class="lens-tag">— Hikâye anlatımı</span>
-        </div>
-      </div>
-      <div class="lens-card">
-        <div class="lens-mm">24</div>
-        <div class="lens-aperture">f/2.8 · Geniş Açı</div>
-        <div class="lens-use">Çevre & manzara</div>
-        <div class="lens-tags">
-          <span class="lens-tag">— Şehir manzarası</span>
-          <span class="lens-tag">— Araç & lokasyon</span>
-          <span class="lens-tag">— Mimari</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="team">
-    <div class="section-label reveal">Ekip</div>
-    <h2 class="intro-title reveal">
-      Projeyi<br>
-      <em>Geliştiren Ekip</em>
-    </h2>
-    <div class="team-grid reveal">
-      <div class="team-card">
-        <div class="team-avatar">👤</div>
-        <div class="team-name">Geliştirici 1</div>
-        <div class="team-role">Frontend & Tasarım</div>
-        <div class="team-desc">HTML, CSS, JavaScript ile arayüz geliştirme. Mapbox entegrasyonu ve harita bileşenleri.</div>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar">👤</div>
-        <div class="team-name">Geliştirici 2</div>
-        <div class="team-role">Backend & Veritabanı</div>
-        <div class="team-desc">PHP / C# ile sunucu tarafı geliştirme. SQL veritabanı tasarımı ve API entegrasyonları.</div>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar">👤</div>
-        <div class="team-name">Geliştirici 3</div>
-        <div class="team-role">API & Işık Hesaplama</div>
-        <div class="team-desc">SunCalc ve hava durumu API entegrasyonu. Koordinat bazlı güneş hesaplama modülü.</div>
-      </div>
-    </div>
-  </section>
-
-  <div class="course">
-    <div class="course-label">Ders Bilgisi</div>
-    <div class="course-info">
-      <div class="course-item">
-        <div class="course-key">Ders</div>
-        <div class="course-val">Web Projesi Yönetimi</div>
-      </div>
-      <div class="course-item">
-        <div class="course-key">Yıl</div>
-        <div class="course-val">2025</div>
-      </div>
-      <div class="course-item">
-        <div class="course-key">Proje Türü</div>
-        <div class="course-val">Web Uygulaması</div>
-      </div>
-      <div class="course-item">
-        <div class="course-key">Platform</div>
-        <div class="course-val">PHP / C# + SQL</div>
-      </div>
-    </div>
-  </div>
-
-  <footer>
-    <div>
-      <div class="footer-logo">Dış Mekan Çekimi</div>
-      <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px">
-        Lokasyon bazlı ışık planlama platformu
-      </div>
-    </div>
-    <ul class="footer-links">
-      <li><a href="index.html">Ana Sayfa</a></li>
-      <li><a href="project.html">Proje</a></li>
-      <li><a href="about.html">Hakkında</a></li>
-      <li><a href="contact.html">İletişim</a></li>
-    </ul>
-    <div class="footer-copy">© 2025 Web Projesi Yönetimi Dersi</div>
-  </footer>
-
-  <script src="main.js"></script>
-</body>
-</html>    <h1 class="page-title">
-      Neden Bu<br>
-      <em>Platform?</em>
-    </h1>
-  </div>
-
-  <section class="intro">
-    <div class="intro-left">
-      <div class="section-label reveal">Motivasyon</div>
-      <h2 class="intro-title reveal">
-        Doğru Işık,<br>
-        <em>Şansa Bırakılmaz</em>
-      </h2>
-      <p class="intro-text reveal">
-        Dar açılı lenslerle — özellikle 135mm F2 gibi sıkıştırma etkisi yüksek objektiflerle — dış mekanda çekim yaparken en büyük zorluk, doğru ışığı ve doğru arka planı aynı anda yakalamaktır.
-      </p>
-      <p class="intro-text reveal">
-        Altın Saat yalnızca gün doğumu ve batımından sonra yaklaşık 45–60 dakika sürer. Bu dar pencereyi verimli kullanmak için çekim yapılacak konumun önceden scouting edilmesi, güneşin tam olarak hangi açıdan geleceğinin bilinmesi ve ekipman seçiminin buna göre yapılması gerekir.
-      </p>
-      <p class="intro-text reveal">
-        Dış-Mekan-Çekimi platformu; bu planlama sürecini harita, ışık hesaplama ve keşif notları ile tek çatı altında toplar.
-      </p>
-    </div>
-
-    <div class="intro-right reveal">
-      <div class="stat-block">
-        <div class="stat-big">47'</div>
-        <div class="stat-info">
-          <div class="stat-title">Altın Saat Süresi</div>
-          <div class="stat-desc">Gün doğumu & batımında ortalama<br>kullanılabilir altın ışık penceresi</div>
-        </div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-big">135</div>
-        <div class="stat-info">
-          <div class="stat-title">Odak Uzaklığı (mm)</div>
-          <div class="stat-desc">Portre & otomobil çekimlerinde<br>tercih edilen dar açılı lens</div>
-        </div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-big">f/2</div>
-        <div class="stat-info">
-          <div class="stat-title">Maksimum Diyafram</div>
-          <div class="stat-desc">Sığ alan derinliği &<br>düşük ışık performansı</div>
-        </div>
-      </div>
-      <div class="stat-block">
-        <div class="stat-big">3°</div>
-        <div class="stat-info">
-          <div class="stat-title">Işık Toleransı</div>
-          <div class="stat-desc">Güneş açısındaki küçük değişimin<br>sahnede yarattığı büyük fark</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="problem">
-    <div class="section-label reveal">Sorun & Çözüm</div>
-    <h2 class="intro-title reveal">
-      Mevcut Zorluklar &<br>
-      <em>Yaklaşımımız</em>
-    </h2>
-    <div class="two-col reveal">
-      <div class="col-card problem-card">
-        <div class="col-card-label">⚠ Mevcut Sorunlar</div>
-        <h3 class="col-card-title">Saha Çekimlerindeki Güçlükler</h3>
-        <ul>
-          <li>Altın Saat zamanı lokasyona göre değişir, genel uygulamalar yeterince hassas değildir</li>
-          <li>Güneşin hangi yönden geleceği önceden bilinmediği için arka plan & ışık çatışır</li>
-          <li>Çekim notları dağınık — kağıt, telefon notu, fotoğraf arşivi ayrı yerlerde tutulur</li>
-          <li>Her lokasyon için en uygun lens manuel olarak tahmin edilir</li>
-          <li>Geçmiş scouting bilgileri kaybolur veya erişilemez hâle gelir</li>
-        </ul>
-      </div>
-      <div class="col-card solution-card">
-        <div class="col-card-label">✓ Platformumuzun Çözümü</div>
-        <h3 class="col-card-title">Tek Platformda Akıllı Planlama</h3>
-        <ul>
-          <li>SunCalc API ile seçilen GPS koordinatına özel dakika hassasiyetinde altın saat hesabı</li>
-          <li>Güneş yayı ve yön göstergesi ile arka plan & ışık uyumunu önceden görselleştirme</li>
-          <li>Harita pinlerine bağlı notlar, lens tavsiyeleri ve referans fotoğraf arşivi</li>
-          <li>Lokasyon bazında otomatik ekipman önerisi (135mm, 85mm, geniş açı)</li>
-          <li>SQL veritabanında kalıcı olarak saklanan scouting geçmişi</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <section class="lens-section">
-    <div class="section-label reveal">Lens Rehberi</div>
-    <h2 class="intro-title reveal">
-      Doğru Lens,<br>
-      <em>Doğru Konum</em>
-    </h2>
-    <div class="lens-grid reveal">
-      <div class="lens-card featured">
-        <div class="lens-badge">Önerilen</div>
-        <div class="lens-mm">135</div>
-        <div class="lens-aperture">f/2 · Tele Portre</div>
-        <div class="lens-use">Sıkıştırma etkisi & bokeh</div>
-        <div class="lens-tags">
-          <span class="lens-tag">— Portre çekimi</span>
-          <span class="lens-tag">— Otomobil detayı</span>
-          <span class="lens-tag">— Uzak arka plan</span>
-        </div>
-      </div>
-      <div class="lens-card">
-        <div class="lens-mm">85</div>
-        <div class="lens-aperture">f/1.8 · Klasik Portre</div>
-        <div class="lens-use">Dengeli perspektif</div>
-        <div class="lens-tags">
-          <span class="lens-tag">— Yüz çekimi</span>
-          <span class="lens-tag">— Sokak portesi</span>
-          <span class="lens-tag">— Düşük ışık</span>
-        </div>
-      </div>
-      <div class="lens-card">
-        <div class="lens-mm">50</div>
-        <div class="lens-aperture">f/1.4 · Normal</div>
-        <div class="lens-use">İnsan gözü perspektifi</div>
-        <div class="lens-tags">
-          <span class="lens-tag">— Çevre & portre</span>
-          <span class="lens-tag">— Full frame</span>
-          <span class="lens-tag">— Hikâye anlatımı</span>
-        </div>
-      </div>
-      <div class="lens-card">
-        <div class="lens-mm">24</div>
-        <div class="lens-aperture">f/2.8 · Geniş Açı</div>
-        <div class="lens-use">Çevre & manzara</div>
-        <div class="lens-tags">
-          <span class="lens-tag">— Şehir manzarası</span>
-          <span class="lens-tag">— Araç & lokasyon</span>
-          <span class="lens-tag">— Mimari</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="team">
-    <div class="section-label reveal">Ekip</div>
-    <h2 class="intro-title reveal">
-      Projeyi<br>
-      <em>Geliştiren Ekip</em>
-    </h2>
-    <div class="team-grid reveal">
-      <div class="team-card">
-        <div class="team-avatar">👤</div>
-        <div class="team-name">Geliştirici 1</div>
-        <div class="team-role">Frontend & Tasarım</div>
-        <div class="team-desc">HTML, CSS, JavaScript ile arayüz geliştirme. Mapbox entegrasyonu ve harita bileşenleri.</div>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar">👤</div>
-        <div class="team-name">Geliştirici 2</div>
-        <div class="team-role">Backend & Veritabanı</div>
-        <div class="team-desc">PHP / C# ile sunucu tarafı geliştirme. SQL veritabanı tasarımı ve API entegrasyonları.</div>
-      </div>
-      <div class="team-card">
-        <div class="team-avatar">👤</div>
-        <div class="team-name">Geliştirici 3</div>
-        <div class="team-role">API & Işık Hesaplama</div>
-        <div class="team-desc">SunCalc ve hava durumu API entegrasyonu. Koordinat bazlı güneş hesaplama modülü.</div>
-      </div>
-    </div>
-  </section>
-
-  <div class="course">
-    <div class="course-label">Ders Bilgisi</div>
-    <div class="course-info">
-      <div class="course-item">
-        <div class="course-key">Ders</div>
-        <div class="course-val">Web Projesi Yönetimi</div>
-      </div>
-      <div class="course-item">
-        <div class="course-key">Yıl</div>
-        <div class="course-val">2025</div>
-      </div>
-      <div class="course-item">
-        <div class="course-key">Proje Türü</div>
-        <div class="course-val">Web Uygulaması</div>
-      </div>
-      <div class="course-item">
-        <div class="course-key">Platform</div>
-        <div class="course-val">PHP / C# + SQL</div>
-      </div>
-    </div>
-  </div>
-
-  <footer>
-    <div>
-      <div class="footer-logo">Dış Mekan Çekimi</div>
-      <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px">
-        Lokasyon bazlı ışık planlama platformu
-      </div>
-    </div>
-    <ul class="footer-links">
-      <li><a href="index.html">Ana Sayfa</a></li>
-      <li><a href="project.html">Proje</a></li>
-      <li><a href="about.html">Hakkında</a></li>
-      <li><a href="contact.html">İletişim</a></li>
-    </ul>
-    <div class="footer-copy">© 2025 Web Projesi Yönetimi Dersi</div>
-  </footer>
-
-  <script src="main.js"></script>
-</body>
-</html>    .cursor {
+    .cursor {
       width: 8px; height: 8px;
       background: var(--gold);
       border-radius: 50%;
@@ -877,7 +498,14 @@
       <li><a href="about.html" class="active">Hakkında</a></li>
       <li><a href="contact.html">İletişim</a></li>
     </ul>
-  </nav>
+      <button class="theme-toggle" id="themeToggle" title="Tema değiştir" aria-label="Tema değiştir">
+        <span class="theme-toggle-icon">🌙</span>
+        <div class="theme-toggle-track">
+          <div class="theme-toggle-thumb"></div>
+        </div>
+        <span class="theme-toggle-icon">☀️</span>
+      </button>
+    </nav>
 
   <!-- PAGE HEADER -->
   <div class="page-header">
@@ -1112,6 +740,35 @@
       });
     }, { threshold: 0.12 });
     reveals.forEach(el => observer.observe(el));
+  </script>
+  <button class="scroll-top-btn" id="scrollTopBtn" title="Yukarı çık" aria-label="Yukarı çık">↑</button>
+
+  <script>
+    /* ── DARK / LIGHT MODE ── */
+    (function() {
+      if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+    })();
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Theme toggle
+      var btn = document.getElementById('themeToggle');
+      if (btn) {
+        btn.addEventListener('click', function() {
+          document.body.classList.toggle('light-mode');
+          localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+        });
+      }
+      // Scroll top
+      var topBtn = document.getElementById('scrollTopBtn');
+      if (topBtn) {
+        window.addEventListener('scroll', function() {
+          topBtn.classList.toggle('visible', window.scrollY > 400);
+        });
+        topBtn.addEventListener('click', function() {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+    });
   </script>
 </body>
 </html>
