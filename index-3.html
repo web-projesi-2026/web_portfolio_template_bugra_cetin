@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <script>(function(){ if(localStorage.getItem('theme')==='light') document.documentElement.classList.add('light-init'); })();</script>
 
   <nav>
     <a href="index.html" class="nav-logo">DIS·MEKAN<span>·CEKİMİ</span></a>
@@ -788,6 +789,13 @@
       <li><a href="about.html">Hakkında</a></li>
       <li><a href="contact.html">İletişim</a></li>
     </ul>
+    <button class="theme-toggle" id="themeToggle" title="Tema değiştir" aria-label="Tema değiştir">
+      <span class="theme-toggle-icon">🌙</span>
+      <div class="theme-toggle-track">
+        <div class="theme-toggle-thumb"></div>
+      </div>
+      <span class="theme-toggle-icon">☀️</span>
+    </button>
   </nav>
 
   <section class="hero">
@@ -1020,7 +1028,8 @@
     <div class="footer-copy">© 2025 Web Projesi Yönetimi Dersi</div>
   </footer>
 
-  <script src="main.js"></script>
+    <button class="scroll-top-btn" id="scrollTopBtn" title="Yukarı çık" aria-label="Yukarı çık">↑</button>
+  <script src="main.js"></script>>
 
 </body>
 </html>
