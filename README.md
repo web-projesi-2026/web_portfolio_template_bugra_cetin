@@ -1,4 +1,7 @@
 [README-3.md](https://github.com/user-attachments/files/28070228/README-3.md)
+
+
+ # HAZIRLAYAN    BUĞRA ÇETİN - BİLGİSAYAR PROGRAMCILIĞI - AHİ EVRAN ÜNİVERSİTESİ - 245711052 - 
 # 📷 Dış Mekan Çekimi
 ### Lokasyon Bazlı Işık Planlama Platformu
 
