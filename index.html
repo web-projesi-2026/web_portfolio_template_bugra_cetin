@@ -459,31 +459,41 @@
   function loadWeather() {
     var widget = document.getElementById('weatherWidget');
     if (!widget) return;
-    // Ankara koordinatları — API key demo (ücretsiz tier)
-    var API_KEY = '351fe56bc47c35803fbd5e80363e035d';
-    var url = 'https://api.openweathermap.org/data/2.5/weather?q=Ankara&units=metric&lang=tr&appid=' + API_KEY;
+    // Open-Meteo — ücretsiz, key yok, CORS sorunu yok, GitHub Pages'de çalışır
+    var url = 'https://api.open-meteo.com/v1/forecast?latitude=39.9334&longitude=32.8597&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,cloud_cover&wind_speed_unit=kmh&timezone=Europe%2FIstanbul';
     fetch(url)
       .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
       .then(function(data){
-        var temp   = Math.round(data.main.temp);
-        var feels  = Math.round(data.main.feels_like);
-        var humid  = data.main.humidity;
-        var wind   = Math.round(data.wind.speed * 3.6); // m/s → km/h
-        var cloud  = data.clouds.all;
-        var desc   = data.weather[0].description;
-        var ICONS  = { Clear:'☀️', Clouds:'☁️', Rain:'🌧️', Drizzle:'🌦️', Snow:'❄️', Thunderstorm:'⛈️', Mist:'🌫️', Fog:'🌫️', Haze:'🌫️' };
-        var icon   = ICONS[data.weather[0].main] || '🌤️';
-        // Çekim puanı
-        var score  = 100 - cloud - (wind > 20 ? 20 : 0) - (data.weather[0].main !== 'Clear' && data.weather[0].main !== 'Clouds' ? 40 : 0);
+        var c     = data.current;
+        var temp  = Math.round(c.temperature_2m);
+        var feels = Math.round(c.apparent_temperature);
+        var humid = c.relative_humidity_2m;
+        var wind  = Math.round(c.wind_speed_10m);
+        var cloud = c.cloud_cover;
+        var code  = c.weather_code;
+        function wmoDesc(code) {
+          if (code === 0)  return { desc: 'Açık', icon: '☀️' };
+          if (code <= 2)   return { desc: 'Az bulutlu', icon: '🌤️' };
+          if (code === 3)  return { desc: 'Kapalı', icon: '☁️' };
+          if (code <= 49)  return { desc: 'Sisli', icon: '🌫️' };
+          if (code <= 59)  return { desc: 'Çisenti', icon: '🌦️' };
+          if (code <= 69)  return { desc: 'Yağmurlu', icon: '🌧️' };
+          if (code <= 79)  return { desc: 'Karlı', icon: '❄️' };
+          if (code <= 84)  return { desc: 'Sağanak', icon: '🌧️' };
+          if (code >= 95)  return { desc: 'Fırtına', icon: '⛈️' };
+          return { desc: 'Bulutlu', icon: '🌥️' };
+        }
+        var w = wmoDesc(code);
+        var score = 100 - cloud - (wind > 20 ? 20 : 0) - (code > 3 ? 40 : 0);
         score = Math.max(0, Math.min(100, score));
         var scoreClass = score >= 70 ? 'good' : score >= 40 ? 'ok' : 'bad';
         var scoreLabel = score >= 70 ? 'Çekim İdeal ✓' : score >= 40 ? 'Çekim Orta' : 'Çekim Zor';
         widget.innerHTML =
-          '<span class="weather-icon">' + icon + '</span>' +
+          '<span class="weather-icon">' + w.icon + '</span>' +
           '<div class="weather-info">' +
             '<div class="weather-city">Ankara, TR</div>' +
             '<div class="weather-temp">' + temp + '°C</div>' +
-            '<div class="weather-desc">' + desc + '</div>' +
+            '<div class="weather-desc">' + w.desc + '</div>' +
           '</div>' +
           '<div class="weather-extras">' +
             '<div class="weather-extra-item"><span class="weather-extra-val">' + humid + '%</span><span class="weather-extra-key">Nem</span></div>' +
@@ -494,7 +504,6 @@
           '<span class="weather-score ' + scoreClass + '">' + score + '/100<br>' + scoreLabel + '</span>';
       })
       .catch(function(){
-        // API key yoksa fallback göster
         widget.innerHTML =
           '<span class="weather-icon">🌤️</span>' +
           '<div class="weather-info">' +
@@ -502,7 +511,7 @@
             '<div class="weather-temp">—°C</div>' +
             '<div class="weather-desc">Hava verisi yüklenemedi</div>' +
           '</div>' +
-          '<span class="weather-score ok" style="margin-left:auto">API Key<br>Gerekli</span>';
+          '<span class="weather-score ok" style="margin-left:auto">Bağlantı<br>Hatası</span>';
       });
   }
 
