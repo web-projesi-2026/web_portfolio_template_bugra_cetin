@@ -460,7 +460,7 @@
     var widget = document.getElementById('weatherWidget');
     if (!widget) return;
     // Open-Meteo — ücretsiz, key yok, CORS sorunu yok, GitHub Pages'de çalışır
-    var url = 'https://api.open-meteo.com/v1/forecast?latitude=39.9334&longitude=32.8597&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,cloud_cover&wind_speed_unit=kmh&timezone=Europe%2FIstanbul';
+    var url = 'https://api.open-meteo.com/v1/forecast?latitude=39.1425&longitude=34.1709&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,cloud_cover&wind_speed_unit=kmh&timezone=Europe%2FIstanbul';
     fetch(url)
       .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
       .then(function(data){
@@ -491,7 +491,7 @@
         widget.innerHTML =
           '<span class="weather-icon">' + w.icon + '</span>' +
           '<div class="weather-info">' +
-            '<div class="weather-city">Ankara, TR</div>' +
+            '<div class="weather-city">Kırşehir, TR</div>' +
             '<div class="weather-temp">' + temp + '°C</div>' +
             '<div class="weather-desc">' + w.desc + '</div>' +
           '</div>' +
@@ -507,7 +507,7 @@
         widget.innerHTML =
           '<span class="weather-icon">🌤️</span>' +
           '<div class="weather-info">' +
-            '<div class="weather-city">Ankara, TR</div>' +
+            '<div class="weather-city">Kırşehir, TR</div>' +
             '<div class="weather-temp">—°C</div>' +
             '<div class="weather-desc">Hava verisi yüklenemedi</div>' +
           '</div>' +
