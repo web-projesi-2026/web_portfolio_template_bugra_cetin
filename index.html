@@ -322,14 +322,23 @@
 
   <script>
   const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2V0aW5idWdyYWEiLCJhIjoiY21uNXRqcnN2MGQ5YzJ0c2NqdW0zaG04ZSJ9.pkCUVwUhkrfNH-zcP1BvDA';
+  const SUPABASE_URL = 'https://zagnyikpieelzbvnfojg.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_EerA2eCYbKE8-_Zk7zvK6A_06Yfibrv';
+
+  function sbFetch(path, options) {
+    return fetch(SUPABASE_URL + '/rest/v1/' + path, Object.assign({}, options, {
+      headers: Object.assign({
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      }, (options && options.headers) || {})
+    }));
+  }
 
   /* ══════════════════════════════════════
-     AUTH SİSTEMİ (localStorage tabanlı)
+     AUTH SİSTEMİ (Supabase)
   ══════════════════════════════════════ */
-  function getUsers() {
-    try { return JSON.parse(localStorage.getItem('dmc_users') || '[]'); } catch(e) { return []; }
-  }
-  function saveUsers(u) { localStorage.setItem('dmc_users', JSON.stringify(u)); }
   function getSession() {
     try { return JSON.parse(localStorage.getItem('dmc_session') || 'null'); } catch(e) { return null; }
   }
@@ -355,14 +364,18 @@
     var pass  = document.getElementById('loginPass').value;
     var errEl = document.getElementById('loginError');
     errEl.classList.remove('show');
-    var users = getUsers();
-    var user  = users.find(function(u){ return u.email === email && u.password === pass; });
-    if (!user) { errEl.textContent = 'E-posta veya şifre hatalı.'; errEl.classList.add('show'); return; }
-    saveSession(user);
-    updateNavUser(user);
-    closeAuth();
-    showAuthToast('Hoşgeldin, ' + user.name.split(' ')[0] + '! 👋');
-    updateAddLocSection();
+    sbFetch('profiles?email=eq.' + encodeURIComponent(email) + '&password=eq.' + encodeURIComponent(pass) + '&select=id,name,email')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (!data || !data.length) { errEl.textContent = 'E-posta veya şifre hatalı.'; errEl.classList.add('show'); return; }
+      saveSession(data[0]);
+      updateNavUser(data[0]);
+      closeAuth();
+      showToast('Hoşgeldin, ' + data[0].name.split(' ')[0] + '! 👋');
+      updateAddLocSection();
+      loadUserLocations();
+    })
+    .catch(function(){ errEl.textContent = 'Sunucu hatası, tekrar dene.'; errEl.classList.add('show'); });
   }
 
   function doRegister() {
@@ -374,22 +387,27 @@
     errEl.classList.remove('show'); sucEl.classList.remove('show');
     if (!name || name.length < 2)  { errEl.textContent = 'Ad soyad en az 2 karakter olmalı.'; errEl.classList.add('show'); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Geçerli bir e-posta gir.'; errEl.classList.add('show'); return; }
-    if (pass.length < 6)  { errEl.textContent = 'Şifre en az 6 karakter olmalı.'; errEl.classList.add('show'); return; }
-    var users = getUsers();
-    if (users.find(function(u){ return u.email === email; })) { errEl.textContent = 'Bu e-posta zaten kayıtlı.'; errEl.classList.add('show'); return; }
-    var newUser = { id: Date.now(), name: name, email: email, password: pass, createdAt: new Date().toISOString() };
-    users.push(newUser);
-    saveUsers(users);
-    sucEl.textContent = '✓ Kayıt başarılı! Giriş yapabilirsin.';
-    sucEl.classList.add('show');
-    setTimeout(function(){ switchTab('login'); document.getElementById('loginEmail').value = email; }, 1500);
+    if (pass.length < 6) { errEl.textContent = 'Şifre en az 6 karakter olmalı.'; errEl.classList.add('show'); return; }
+    sbFetch('profiles', {
+      method: 'POST',
+      body: JSON.stringify({ name: name, email: email, password: pass })
+    })
+    .then(function(r){
+      if (r.status === 409 || r.status === 400) { errEl.textContent = 'Bu e-posta zaten kayıtlı.'; errEl.classList.add('show'); return; }
+      sucEl.textContent = '✓ Kayıt başarılı! Giriş yapabilirsin.';
+      sucEl.classList.add('show');
+      setTimeout(function(){ switchTab('login'); document.getElementById('loginEmail').value = email; }, 1500);
+    })
+    .catch(function(){ errEl.textContent = 'Sunucu hatası, tekrar dene.'; errEl.classList.add('show'); });
   }
 
   function doLogout() {
     clearSession();
     updateNavUser(null);
-    showAuthToast('Çıkış yapıldı.');
+    showToast('Çıkış yapıldı.');
     updateAddLocSection();
+    window.allLocations = window.baseLocations;
+    window.renderCards();
   }
 
   function updateNavUser(user) {
@@ -413,17 +431,33 @@
     sec.style.display = session ? '' : 'none';
   }
 
-  function showAuthToast(msg) {
-    showToast(msg);
+  function loadUserLocations() {
+    sbFetch('locations?select=*,profiles(name)&order=added_at.desc')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (!Array.isArray(data)) return;
+      var userLocs = data.map(function(l){
+        return {
+          id: 'db_' + l.id, db_id: l.id,
+          name: l.name, city: l.city, category: l.category,
+          lens: l.lens, goldenHour: l.golden_hour, direction: l.direction,
+          description: l.description, rating: parseInt(l.rating) || 3,
+          tags: [l.category], image: l.category === 'Portre' ? '🏙️' : '🚗',
+          addedBy: l.profiles ? l.profiles.name : 'Kullanıcı',
+          isUserAdded: true, user_id: l.user_id
+        };
+      });
+      window.allLocations = window.baseLocations.concat(userLocs);
+      window.renderCards();
+    })
+    .catch(function(){});
   }
 
   /* ══════════════════════════════════════
-     YENİ LOKASYON EKLEME (veritabanı simülasyonu)
+     YENİ LOKASYON EKLEME (Supabase)
   ══════════════════════════════════════ */
-  function getUserLocations() {
-    try { return JSON.parse(localStorage.getItem('dmc_user_locations') || '[]'); } catch(e) { return []; }
-  }
-  function saveUserLocations(locs) { localStorage.setItem('dmc_user_locations', JSON.stringify(locs)); }
+  function getUserLocations() { return []; }
+  function saveUserLocations() {}
 
   function submitNewLocation() {
     var session = getSession();
@@ -436,28 +470,21 @@
     var dir    = document.getElementById('newLocDir').value.trim() || 'Güney';
     var desc   = document.getElementById('newLocDesc').value.trim();
     if (!name) { showToast('⚠ Lokasyon adı zorunlu.'); return; }
-    var EMOJIS = { 'Portre': '🏙️', 'Otomobil Çekimi': '🚗' };
-    var newLoc = {
-      id: Date.now(),
-      name: name, city: city, category: cat,
-      lens: lens, goldenHour: golden, direction: dir, rating: 3,
-      description: desc || 'Kullanıcı tarafından eklendi.',
-      tags: [cat], image: EMOJIS[cat] || '📍',
-      addedBy: session.name, addedAt: new Date().toLocaleString('tr-TR'),
-      isUserAdded: true
-    };
-    var userLocs = getUserLocations();
-    userLocs.push(newLoc);
-    saveUserLocations(userLocs);
-    // Reset form
-    ['newLocName','newLocCity','newLocLens','newLocGolden','newLocDir','newLocDesc'].forEach(function(id){
-      var el = document.getElementById(id); if(el) el.value = '';
-    });
-    // Reload cards
-    allLocations = baseLocations.concat(getUserLocations());
-    renderCards();
-    showToast('✓ Lokasyon kaydedildi: ' + name);
-    document.getElementById('addLocSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    sbFetch('locations', {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: session.id, name: name, city: city, category: cat,
+        lens: lens, golden_hour: golden, direction: dir, description: desc, rating: 3
+      })
+    })
+    .then(function(){
+      ['newLocName','newLocCity','newLocLens','newLocGolden','newLocDir','newLocDesc'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.value = '';
+      });
+      showToast('✓ Lokasyon kaydedildi: ' + name);
+      loadUserLocations();
+    })
+    .catch(function(){ showToast('⚠ Hata oluştu.'); });
   }
 
   /* ══════════════════════════════════════
@@ -584,6 +611,7 @@
     /* AUTH DURUMUNU GÜNCELLe */
     updateNavUser(getSession());
     updateAddLocSection();
+    loadUserLocations();
 
     /* HAVA DURUMU */
     loadWeather();
@@ -755,13 +783,17 @@
         grid.querySelectorAll('.delete-btn').forEach(function(btn) {
           btn.addEventListener('click', function(e) {
             e.stopPropagation();
-            var id = parseInt(btn.dataset.id);
+            var id = btn.dataset.id;
+            var session = getSession();
             if (!confirm('Bu lokasyonu silmek istediğine emin misin?')) return;
-            var userLocs = getUserLocations().filter(function(l){ return l.id !== id; });
-            saveUserLocations(userLocs);
-            window.allLocations = window.baseLocations.concat(getUserLocations());
-            window.renderCards();
-            showToast('🗑 Lokasyon silindi.');
+            sbFetch('locations?id=eq.' + id + (session ? '&user_id=eq.' + session.id : ''), {
+              method: 'DELETE'
+            })
+            .then(function(){
+              showToast('🗑 Lokasyon silindi.');
+              loadUserLocations();
+            })
+            .catch(function(){ showToast('⚠ Silme başarısız.'); });
           });
         });
       };
