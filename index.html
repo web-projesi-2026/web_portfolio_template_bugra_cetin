@@ -6,7 +6,8 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dış-Mekan-Çekimi | Lokasyon Işık Planlama</title>
+  <title>Dış Mekan Çekimi | Lokasyon Işık Planlama</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
@@ -29,7 +30,8 @@
       <li><a href="about.html">Hakkında</a></li>
       <li><a href="contact.html">İletişim</a></li>
     </ul>
-    <div style="display:flex;align-items:center;gap:16px;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="nav-user-btn" id="navUserBtn" onclick="openAuth()">Giriş Yap</button>
       <button class="theme-toggle" id="themeToggle" title="Tema değiştir" aria-label="Tema değiştir">
         <span class="theme-toggle-icon">🌙</span>
         <div class="theme-toggle-track"><div class="theme-toggle-thumb"></div></div>
@@ -183,12 +185,73 @@
       </div>
     </div>
 
+    <!-- HAVA DURUMU WIDGET -->
+    <div class="weather-widget reveal" id="weatherWidget">
+      <span class="weather-loading">⟳ Ankara hava durumu yükleniyor...</span>
+    </div>
+
+    <!-- ARAMA & SIRALAMA -->
+    <div class="search-sort-bar reveal">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="loc-search" id="locSearch" placeholder="Lokasyon ara... (isim, açıklama, etiket)">
+      </div>
+      <select class="loc-sort" id="locSort">
+        <option value="default">Varsayılan Sıra</option>
+        <option value="rating-desc">Puana Göre ↓</option>
+        <option value="rating-asc">Puana Göre ↑</option>
+        <option value="name-asc">İsme Göre (A→Z)</option>
+        <option value="name-desc">İsme Göre (Z→A)</option>
+      </select>
+      <span class="loc-count-badge" id="locCountBadge"></span>
+    </div>
+
     <div class="locations-grid" id="locationsGrid">
       <!-- JS ile doldurulacak -->
     </div>
 
     <div class="fav-empty" id="favEmpty" style="display:none">
       <p>Henüz favori lokasyon eklemediniz.<br><span>Kartlardaki ♥ ikonuna tıklayın.</span></p>
+    </div>
+
+    <!-- LOKASYON EKLEME FORMU (giriş yapınca görünür) -->
+    <div class="add-loc-section" id="addLocSection" style="display:none">
+      <h3 class="add-loc-title">Yeni Lokasyon <em>Ekle</em></h3>
+      <p class="add-loc-subtitle">Keşfettiğin bir mekanı kaydet — JSON veritabanına eklenecek.</p>
+      <div class="add-loc-grid">
+        <div class="add-loc-field">
+          <label>Lokasyon Adı</label>
+          <input type="text" id="newLocName" placeholder="Örn: Kuğulu Park">
+        </div>
+        <div class="add-loc-field">
+          <label>Şehir</label>
+          <input type="text" id="newLocCity" placeholder="Ankara">
+        </div>
+        <div class="add-loc-field">
+          <label>Kategori</label>
+          <select id="newLocCategory">
+            <option>Portre</option>
+            <option>Otomobil Çekimi</option>
+          </select>
+        </div>
+        <div class="add-loc-field">
+          <label>Lens Önerisi</label>
+          <input type="text" id="newLocLens" placeholder="135mm F2">
+        </div>
+        <div class="add-loc-field">
+          <label>Altın Saat</label>
+          <input type="text" id="newLocGolden" placeholder="17:50">
+        </div>
+        <div class="add-loc-field">
+          <label>Yön</label>
+          <input type="text" id="newLocDir" placeholder="Güney-Batı">
+        </div>
+        <div class="add-loc-field full">
+          <label>Açıklama</label>
+          <textarea id="newLocDesc" rows="2" placeholder="Çekim notları, kompozisyon ipuçları..."></textarea>
+        </div>
+      </div>
+      <button class="add-loc-submit" onclick="submitNewLocation()">+ Lokasyonu Kaydet</button>
     </div>
   </section>
 
@@ -217,10 +280,231 @@
     <div class="footer-copy">© 2025 Web Projesi Yönetimi Dersi</div>
   </footer>
 
+  <!-- ── AUTH MODAL ── -->
+  <div class="auth-modal-overlay" id="authModal">
+    <div class="auth-modal">
+      <button class="auth-close" onclick="closeAuth()">✕</button>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Giriş Yap</button>
+        <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Kayıt Ol</button>
+      </div>
+      <!-- GİRİŞ -->
+      <div id="loginPanel">
+        <h3 class="auth-form-title">Tekrar <em>Hoşgeldin</em></h3>
+        <p class="auth-subtitle">Lokasyonlarını görmek için giriş yap.</p>
+        <div class="auth-field"><label>E-posta</label><input type="email" id="loginEmail" placeholder="ornek@mail.com"></div>
+        <div class="auth-field"><label>Şifre</label><input type="password" id="loginPass" placeholder="••••••••"></div>
+        <div class="auth-error" id="loginError"></div>
+        <button class="auth-btn" onclick="doLogin()">Giriş Yap →</button>
+      </div>
+      <!-- KAYIT -->
+      <div id="registerPanel" style="display:none">
+        <h3 class="auth-form-title">Hesap <em>Oluştur</em></h3>
+        <p class="auth-subtitle">Lokasyonlarını kaydetmek için üye ol.</p>
+        <div class="auth-field"><label>Ad Soyad</label><input type="text" id="regName" placeholder="Ahmet Yılmaz"></div>
+        <div class="auth-field"><label>E-posta</label><input type="email" id="regEmail" placeholder="ornek@mail.com"></div>
+        <div class="auth-field"><label>Şifre</label><input type="password" id="regPass" placeholder="En az 6 karakter"></div>
+        <div class="auth-error" id="regError"></div>
+        <div class="auth-success" id="regSuccess"></div>
+        <button class="auth-btn" onclick="doRegister()">Kayıt Ol →</button>
+      </div>
+    </div>
+  </div>
+
   <button class="scroll-top-btn" id="scrollTopBtn" title="Yukarı çık" aria-label="Yukarı çık">↑</button>
 
   <script>
   const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2V0aW5idWdyYWEiLCJhIjoiY21uNXRqcnN2MGQ5YzJ0c2NqdW0zaG04ZSJ9.pkCUVwUhkrfNH-zcP1BvDA';
+
+  /* ══════════════════════════════════════
+     AUTH SİSTEMİ (localStorage tabanlı)
+  ══════════════════════════════════════ */
+  function getUsers() {
+    try { return JSON.parse(localStorage.getItem('dmc_users') || '[]'); } catch(e) { return []; }
+  }
+  function saveUsers(u) { localStorage.setItem('dmc_users', JSON.stringify(u)); }
+  function getSession() {
+    try { return JSON.parse(localStorage.getItem('dmc_session') || 'null'); } catch(e) { return null; }
+  }
+  function saveSession(u) { localStorage.setItem('dmc_session', JSON.stringify(u)); }
+  function clearSession() { localStorage.removeItem('dmc_session'); }
+
+  function openAuth() {
+    document.getElementById('authModal').classList.add('open');
+    switchTab('login');
+  }
+  function closeAuth() {
+    document.getElementById('authModal').classList.remove('open');
+  }
+  function switchTab(tab) {
+    document.getElementById('loginPanel').style.display   = tab === 'login'    ? '' : 'none';
+    document.getElementById('registerPanel').style.display = tab === 'register' ? '' : 'none';
+    document.getElementById('tabLogin').classList.toggle('active',    tab === 'login');
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+  }
+
+  function doLogin() {
+    var email = document.getElementById('loginEmail').value.trim().toLowerCase();
+    var pass  = document.getElementById('loginPass').value;
+    var errEl = document.getElementById('loginError');
+    errEl.classList.remove('show');
+    var users = getUsers();
+    var user  = users.find(function(u){ return u.email === email && u.password === pass; });
+    if (!user) { errEl.textContent = 'E-posta veya şifre hatalı.'; errEl.classList.add('show'); return; }
+    saveSession(user);
+    updateNavUser(user);
+    closeAuth();
+    showAuthToast('Hoşgeldin, ' + user.name.split(' ')[0] + '! 👋');
+    updateAddLocSection();
+  }
+
+  function doRegister() {
+    var name  = document.getElementById('regName').value.trim();
+    var email = document.getElementById('regEmail').value.trim().toLowerCase();
+    var pass  = document.getElementById('regPass').value;
+    var errEl = document.getElementById('regError');
+    var sucEl = document.getElementById('regSuccess');
+    errEl.classList.remove('show'); sucEl.classList.remove('show');
+    if (!name || name.length < 2)  { errEl.textContent = 'Ad soyad en az 2 karakter olmalı.'; errEl.classList.add('show'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Geçerli bir e-posta gir.'; errEl.classList.add('show'); return; }
+    if (pass.length < 6)  { errEl.textContent = 'Şifre en az 6 karakter olmalı.'; errEl.classList.add('show'); return; }
+    var users = getUsers();
+    if (users.find(function(u){ return u.email === email; })) { errEl.textContent = 'Bu e-posta zaten kayıtlı.'; errEl.classList.add('show'); return; }
+    var newUser = { id: Date.now(), name: name, email: email, password: pass, createdAt: new Date().toISOString() };
+    users.push(newUser);
+    saveUsers(users);
+    sucEl.textContent = '✓ Kayıt başarılı! Giriş yapabilirsin.';
+    sucEl.classList.add('show');
+    setTimeout(function(){ switchTab('login'); document.getElementById('loginEmail').value = email; }, 1500);
+  }
+
+  function doLogout() {
+    clearSession();
+    updateNavUser(null);
+    showAuthToast('Çıkış yapıldı.');
+    updateAddLocSection();
+  }
+
+  function updateNavUser(user) {
+    var btn = document.getElementById('navUserBtn');
+    if (!btn) return;
+    if (user) {
+      btn.textContent = '👤 ' + user.name.split(' ')[0];
+      btn.classList.add('logged-in');
+      btn.onclick = function(){ if(confirm('Çıkış yapmak istiyor musun?')) doLogout(); };
+    } else {
+      btn.textContent = 'Giriş Yap';
+      btn.classList.remove('logged-in');
+      btn.onclick = openAuth;
+    }
+  }
+
+  function updateAddLocSection() {
+    var sec = document.getElementById('addLocSection');
+    if (!sec) return;
+    var session = getSession();
+    sec.style.display = session ? '' : 'none';
+  }
+
+  function showAuthToast(msg) {
+    showToast(msg);
+  }
+
+  /* ══════════════════════════════════════
+     YENİ LOKASYON EKLEME (veritabanı simülasyonu)
+  ══════════════════════════════════════ */
+  function getUserLocations() {
+    try { return JSON.parse(localStorage.getItem('dmc_user_locations') || '[]'); } catch(e) { return []; }
+  }
+  function saveUserLocations(locs) { localStorage.setItem('dmc_user_locations', JSON.stringify(locs)); }
+
+  function submitNewLocation() {
+    var session = getSession();
+    if (!session) { openAuth(); return; }
+    var name   = document.getElementById('newLocName').value.trim();
+    var city   = document.getElementById('newLocCity').value.trim() || 'Ankara';
+    var cat    = document.getElementById('newLocCategory').value;
+    var lens   = document.getElementById('newLocLens').value.trim() || '85mm F1.8';
+    var golden = document.getElementById('newLocGolden').value.trim() || '--:--';
+    var dir    = document.getElementById('newLocDir').value.trim() || 'Güney';
+    var desc   = document.getElementById('newLocDesc').value.trim();
+    if (!name) { showToast('⚠ Lokasyon adı zorunlu.'); return; }
+    var EMOJIS = { 'Portre': '🏙️', 'Otomobil Çekimi': '🚗' };
+    var newLoc = {
+      id: Date.now(),
+      name: name, city: city, category: cat,
+      lens: lens, goldenHour: golden, direction: dir, rating: 3,
+      description: desc || 'Kullanıcı tarafından eklendi.',
+      tags: [cat], image: EMOJIS[cat] || '📍',
+      addedBy: session.name, addedAt: new Date().toLocaleString('tr-TR'),
+      isUserAdded: true
+    };
+    var userLocs = getUserLocations();
+    userLocs.push(newLoc);
+    saveUserLocations(userLocs);
+    // Reset form
+    ['newLocName','newLocCity','newLocLens','newLocGolden','newLocDir','newLocDesc'].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.value = '';
+    });
+    // Reload cards
+    allLocations = baseLocations.concat(getUserLocations());
+    renderCards();
+    showToast('✓ Lokasyon kaydedildi: ' + name);
+    document.getElementById('addLocSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  /* ══════════════════════════════════════
+     HAVA DURUMU (OpenWeatherMap)
+  ══════════════════════════════════════ */
+  function loadWeather() {
+    var widget = document.getElementById('weatherWidget');
+    if (!widget) return;
+    // Ankara koordinatları — API key demo (ücretsiz tier)
+    var API_KEY = '351fe56bc47c35803fbd5e80363e035d';
+    var url = 'https://api.openweathermap.org/data/2.5/weather?q=Ankara,TR&units=metric&lang=tr&appid=' + API_KEY;
+    fetch(url)
+      .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      .then(function(data){
+        var temp   = Math.round(data.main.temp);
+        var feels  = Math.round(data.main.feels_like);
+        var humid  = data.main.humidity;
+        var wind   = Math.round(data.wind.speed * 3.6); // m/s → km/h
+        var cloud  = data.clouds.all;
+        var desc   = data.weather[0].description;
+        var ICONS  = { Clear:'☀️', Clouds:'☁️', Rain:'🌧️', Drizzle:'🌦️', Snow:'❄️', Thunderstorm:'⛈️', Mist:'🌫️', Fog:'🌫️', Haze:'🌫️' };
+        var icon   = ICONS[data.weather[0].main] || '🌤️';
+        // Çekim puanı
+        var score  = 100 - cloud - (wind > 20 ? 20 : 0) - (data.weather[0].main !== 'Clear' && data.weather[0].main !== 'Clouds' ? 40 : 0);
+        score = Math.max(0, Math.min(100, score));
+        var scoreClass = score >= 70 ? 'good' : score >= 40 ? 'ok' : 'bad';
+        var scoreLabel = score >= 70 ? 'Çekim İdeal ✓' : score >= 40 ? 'Çekim Orta' : 'Çekim Zor';
+        widget.innerHTML =
+          '<span class="weather-icon">' + icon + '</span>' +
+          '<div class="weather-info">' +
+            '<div class="weather-city">Ankara, TR</div>' +
+            '<div class="weather-temp">' + temp + '°C</div>' +
+            '<div class="weather-desc">' + desc + '</div>' +
+          '</div>' +
+          '<div class="weather-extras">' +
+            '<div class="weather-extra-item"><span class="weather-extra-val">' + humid + '%</span><span class="weather-extra-key">Nem</span></div>' +
+            '<div class="weather-extra-item"><span class="weather-extra-val">' + wind + ' km/h</span><span class="weather-extra-key">Rüzgar</span></div>' +
+            '<div class="weather-extra-item"><span class="weather-extra-val">' + cloud + '%</span><span class="weather-extra-key">Bulut</span></div>' +
+            '<div class="weather-extra-item"><span class="weather-extra-val">' + feels + '°C</span><span class="weather-extra-key">Hissedilen</span></div>' +
+          '</div>' +
+          '<span class="weather-score ' + scoreClass + '">' + score + '/100<br>' + scoreLabel + '</span>';
+      })
+      .catch(function(){
+        // API key yoksa fallback göster
+        widget.innerHTML =
+          '<span class="weather-icon">🌤️</span>' +
+          '<div class="weather-info">' +
+            '<div class="weather-city">Ankara, TR</div>' +
+            '<div class="weather-temp">—°C</div>' +
+            '<div class="weather-desc">Hava verisi yüklenemedi</div>' +
+          '</div>' +
+          '<span class="weather-score ok" style="margin-left:auto">API Key<br>Gerekli</span>';
+      });
+  }
 
   document.addEventListener('DOMContentLoaded', function() {
 
@@ -229,7 +513,6 @@
     var ring   = document.getElementById('cursorRing');
     if (cursor && ring) {
       var mx=0,my=0,rx=0,ry=0;
-      // Sadece mouse varsa özel cursor aktif
       document.body.style.cursor = 'none';
       document.addEventListener('mousemove', function(e){ mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
       (function loop(){ rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(loop); })();
@@ -247,13 +530,8 @@
     var ham  = document.getElementById('hamburger');
     var navL = document.getElementById('navLinks');
     if (ham && navL) {
-      ham.addEventListener('click', function(){
-        ham.classList.toggle('open');
-        navL.classList.toggle('open');
-      });
-      navL.querySelectorAll('a').forEach(function(a){
-        a.addEventListener('click', function(){ ham.classList.remove('open'); navL.classList.remove('open'); });
-      });
+      ham.addEventListener('click', function(){ ham.classList.toggle('open'); navL.classList.toggle('open'); });
+      navL.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(){ ham.classList.remove('open'); navL.classList.remove('open'); }); });
     }
 
     /* SCROLL REVEAL */
@@ -282,18 +560,27 @@
       topBtn.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); });
     }
 
+    /* MODAL KAPAT — overlay tıklama */
+    document.getElementById('authModal').addEventListener('click', function(e){
+      if (e.target === this) closeAuth();
+    });
+
+    /* AUTH DURUMUNU GÜNCELLe */
+    updateNavUser(getSession());
+    updateAddLocSection();
+
+    /* HAVA DURUMU */
+    loadWeather();
+
     /* HARİTA */
     var mapEl = document.getElementById('map');
     if (mapEl) {
       mapboxgl.accessToken = MAPBOX_TOKEN;
       var map = new mapboxgl.Map({ container:'map', style:'mapbox://styles/mapbox/dark-v11', center:[32.8597,39.9334], zoom:12 });
       map.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
       var PIN_COLORS = { 'Otomobil Çekimi':'#e87b3a','Portre':'#d4a843','Altın Saat':'#f0c060','135mm Uygun':'#a0c4ff','Geniş Açı':'#80d4a0' };
       var locs = JSON.parse(localStorage.getItem('dmc_locations')||'[]');
-
       function fmtTime(d){ if(!d||isNaN(d)) return '--:--'; return d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',hour12:false}); }
-
       function addMarker(loc) {
         var color = PIN_COLORS[loc.tag]||'#d4a843';
         var el = document.createElement('div');
@@ -312,9 +599,7 @@
           '</div>');
         new mapboxgl.Marker(el).setLngLat([loc.lng,loc.lat]).setPopup(popup).addTo(map);
       }
-
       locs.forEach(addMarker);
-
       map.on('click', function(e){
         var name=prompt('📍 Lokasyon adı:'); if(!name) return;
         var tag=prompt('Etiket (Portre / Otomobil Çekimi / Altın Saat / 135mm Uygun / Geniş Açı):','Portre')||'Portre';
@@ -325,27 +610,22 @@
       });
     }
 
-    /* ── LOKASYONLAR — JSON okuma, kart listeleme, favori (localStorage) ── */
+    /* ══════════════════════════════════════
+       LOKASYONLAR — JSON + Kullanıcı lokasyonları
+    ══════════════════════════════════════ */
     (function() {
       var FAVS_KEY = 'dmc_favorites';
       var showOnlyFavs = false;
       var currentFilter = 'all';
-      var allLocations = [];
+      var searchQuery = '';
+      var sortMode = 'default';
+      window.allLocations = [];
+      window.baseLocations = [];
 
-      function getFavs() {
-        try { return JSON.parse(localStorage.getItem(FAVS_KEY) || '[]'); } catch(e) { return []; }
-      }
-      function saveFavs(favs) {
-        localStorage.setItem(FAVS_KEY, JSON.stringify(favs));
-      }
+      function getFavs() { try { return JSON.parse(localStorage.getItem(FAVS_KEY) || '[]'); } catch(e) { return []; } }
+      function saveFavs(favs) { localStorage.setItem(FAVS_KEY, JSON.stringify(favs)); }
       function isFav(id) { return getFavs().indexOf(id) !== -1; }
-      function toggleFav(id) {
-        var favs = getFavs();
-        var idx = favs.indexOf(id);
-        if (idx === -1) favs.push(id); else favs.splice(idx, 1);
-        saveFavs(favs);
-        return idx === -1; // true = added
-      }
+      function toggleFav(id) { var favs=getFavs(); var idx=favs.indexOf(id); if(idx===-1) favs.push(id); else favs.splice(idx,1); saveFavs(favs); return idx===-1; }
 
       function updateFavCount() {
         var count = getFavs().length;
@@ -367,6 +647,7 @@
         div.className = 'loc-card reveal';
         div.dataset.category = loc.category;
         div.dataset.id = loc.id;
+        var userBadge = loc.isUserAdded ? '<span style="font-family:var(--font-mono);font-size:8px;color:var(--accent);letter-spacing:0.1em;display:block;margin-top:4px">+ ' + (loc.addedBy||'Kullanıcı') + ' tarafından eklendi</span>' : '';
         div.innerHTML =
           '<div class="loc-card-top">' +
             '<div class="loc-emoji">' + loc.image + '</div>' +
@@ -375,6 +656,7 @@
           '<div class="loc-category">' + loc.category + '</div>' +
           '<h3 class="loc-name">' + loc.name + '</h3>' +
           '<p class="loc-city">📍 ' + loc.city + '</p>' +
+          userBadge +
           '<p class="loc-desc">' + loc.description + '</p>' +
           '<div class="loc-meta">' +
             '<div class="loc-meta-item"><span class="loc-meta-key">Lens</span><span class="loc-meta-val">' + loc.lens + '</span></div>' +
@@ -386,55 +668,68 @@
         return div;
       }
 
-      function renderCards() {
+      window.renderCards = function() {
         var grid = document.getElementById('locationsGrid');
         var empty = document.getElementById('favEmpty');
         if (!grid) return;
         grid.innerHTML = '';
         var favs = getFavs();
-        var filtered = allLocations.filter(function(loc) {
-          var catOk = currentFilter === 'all' || loc.category === currentFilter;
-          var favOk = !showOnlyFavs || favs.indexOf(loc.id) !== -1;
-          return catOk && favOk;
+        var filtered = window.allLocations.filter(function(loc) {
+          var catOk  = currentFilter === 'all' || loc.category === currentFilter;
+          var favOk  = !showOnlyFavs || favs.indexOf(loc.id) !== -1;
+          var q      = searchQuery.toLowerCase();
+          var searchOk = !q ||
+            loc.name.toLowerCase().indexOf(q) !== -1 ||
+            (loc.description && loc.description.toLowerCase().indexOf(q) !== -1) ||
+            (loc.tags && loc.tags.some(function(t){ return t.toLowerCase().indexOf(q) !== -1; })) ||
+            (loc.city && loc.city.toLowerCase().indexOf(q) !== -1);
+          return catOk && favOk && searchOk;
         });
+
+        // SIRALAMA
+        if (sortMode === 'rating-desc') filtered.sort(function(a,b){ return b.rating - a.rating; });
+        else if (sortMode === 'rating-asc') filtered.sort(function(a,b){ return a.rating - b.rating; });
+        else if (sortMode === 'name-asc') filtered.sort(function(a,b){ return a.name.localeCompare(b.name, 'tr'); });
+        else if (sortMode === 'name-desc') filtered.sort(function(a,b){ return b.name.localeCompare(a.name, 'tr'); });
+
+        // Sonuç sayacı
+        var badge = document.getElementById('locCountBadge');
+        if (badge) badge.textContent = filtered.length + ' lokasyon gösteriliyor';
+
         if (showOnlyFavs && filtered.length === 0) {
           if (empty) empty.style.display = 'flex';
+        } else if (filtered.length === 0 && searchQuery) {
+          if (empty) empty.style.display = 'none';
+          var noR = document.createElement('div');
+          noR.className = 'no-results';
+          noR.innerHTML = '"' + searchQuery + '" için sonuç bulunamadı.<span>Farklı anahtar kelimeler dene.</span>';
+          grid.appendChild(noR);
         } else {
           if (empty) empty.style.display = 'none';
         }
+
         filtered.forEach(function(loc, i) {
           var card = createCard(loc);
           card.style.transitionDelay = (i * 0.07) + 's';
           grid.appendChild(card);
-          // reveal trigger
           setTimeout(function(){ card.classList.add('visible'); }, 60 + i * 70);
         });
         updateFavCount();
-        // bind fav buttons
+
         grid.querySelectorAll('.fav-btn').forEach(function(btn) {
           btn.addEventListener('click', function(e) {
             e.stopPropagation();
             var id = parseInt(btn.dataset.id);
             var added = toggleFav(id);
             btn.classList.toggle('active', added);
-            // toast
             showToast(added ? '♥ Favorilere eklendi' : '♡ Favorilerden çıkarıldı');
             updateFavCount();
-            if (showOnlyFavs) renderCards();
+            if (showOnlyFavs) window.renderCards();
           });
         });
-      }
+      };
 
-      function showToast(msg) {
-        var t = document.getElementById('locToast');
-        if (!t) { t = document.createElement('div'); t.id = 'locToast'; t.className = 'loc-toast'; document.body.appendChild(t); }
-        t.textContent = msg;
-        t.classList.add('show');
-        clearTimeout(t._timer);
-        t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2200);
-      }
-
-      // Filter buttons
+      /* Kategori filtreleme */
       document.querySelectorAll('.loc-filter').forEach(function(btn) {
         btn.addEventListener('click', function() {
           document.querySelectorAll('.loc-filter').forEach(function(b){ b.classList.remove('active'); });
@@ -442,10 +737,11 @@
           currentFilter = btn.dataset.filter;
           showOnlyFavs = false;
           document.getElementById('favToggle').classList.remove('active');
-          renderCards();
+          window.renderCards();
         });
       });
 
+      /* Favori toggle */
       var favToggle = document.getElementById('favToggle');
       if (favToggle) {
         favToggle.addEventListener('click', function() {
@@ -454,32 +750,61 @@
           currentFilter = 'all';
           document.querySelectorAll('.loc-filter').forEach(function(b){ b.classList.remove('active'); });
           document.querySelector('.loc-filter[data-filter="all"]').classList.add('active');
-          renderCards();
+          window.renderCards();
         });
       }
 
-      // JSON fetch
+      /* ARAMA */
+      var searchEl = document.getElementById('locSearch');
+      if (searchEl) {
+        searchEl.addEventListener('input', function() {
+          searchQuery = searchEl.value;
+          window.renderCards();
+        });
+      }
+
+      /* SIRALAMA */
+      var sortEl = document.getElementById('locSort');
+      if (sortEl) {
+        sortEl.addEventListener('change', function() {
+          sortMode = sortEl.value;
+          window.renderCards();
+        });
+      }
+
+      /* JSON + kullanıcı lokasyonları yükle */
       fetch('locations.json')
         .then(function(r){ return r.json(); })
         .then(function(data) {
-          allLocations = data;
-          renderCards();
+          window.baseLocations = data;
+          window.allLocations  = data.concat(getUserLocations());
+          window.renderCards();
         })
         .catch(function() {
-          // Fallback: inline data if fetch fails (e.g. file:// protocol)
-          allLocations = [
+          window.baseLocations = [
             { id:1, name:"Çankaya Bulvarı", city:"Ankara", category:"Portre", lens:"135mm F2", goldenHour:"17:50", direction:"Güney-Batı", rating:5, description:"Geniş kaldırımlar ve ağaç sıraları ile muhteşem altın saat ışığı.", tags:["Altın Saat","135mm Uygun"], image:"🏙️" },
             { id:2, name:"Atatürk Orman Çiftliği", city:"Ankara", category:"Otomobil Çekimi", lens:"85mm F1.8", goldenHour:"18:10", direction:"Doğu", rating:4, description:"Uzun düz yollar ve çevre yeşilliği ile otomobil çekimleri için mükemmel.", tags:["Otomobil Çekimi","Geniş Alan"], image:"🚗" },
             { id:3, name:"Anıtkabir Çevresi", city:"Ankara", category:"Portre", lens:"135mm F2", goldenHour:"07:28", direction:"Kuzey-Doğu", rating:5, description:"Tarihi mimari arka planlar ve açık alan kompozisyonları.", tags:["135mm Uygun","Tarihi"], image:"🏛️" },
             { id:4, name:"Kugulu Park", city:"Ankara", category:"Portre", lens:"85mm F1.8", goldenHour:"17:45", direction:"Batı", rating:4, description:"Su yansımaları ve doğal bokeh için ideal.", tags:["Su Yansıması","Doğal"], image:"🦢" },
             { id:5, name:"Gençlik Parkı", city:"Ankara", category:"Portre", lens:"50mm F1.4", goldenHour:"18:00", direction:"Güney", rating:3, description:"Kent merkezinde ulaşımı kolay lokasyon.", tags:["Kentsel","Kolay Erişim"], image:"🌳" },
-            { id:6, name:"Çankaya Köşkü Yolu", city:"Ankara", category:"Otomobil Çekimi", lens:"135mm F2", goldenHour:"07:35", direction:"Kuzey", rating:5, description:"Virajlı yollar ve çam ormanı arka planı. Aksiyon çekimleri için ideal.", tags:["Otomobil Çekimi","Orman"], image:"🛣️" }
+            { id:6, name:"Çankaya Köşkü Yolu", city:"Ankara", category:"Otomobil Çekimi", lens:"135mm F2", goldenHour:"07:35", direction:"Kuzey", rating:5, description:"Virajlı yollar ve çam ormanı arka planı.", tags:["Otomobil Çekimi","Orman"], image:"🛣️" }
           ];
-          renderCards();
+          window.allLocations = window.baseLocations.concat(getUserLocations());
+          window.renderCards();
         });
-    })(); // LOKASYONLAR bloğu kapandı
+    })();
 
   }); // DOMContentLoaded kapandı
+
+  /* Toast (global) */
+  function showToast(msg) {
+    var t = document.getElementById('locToast');
+    if (!t) { t = document.createElement('div'); t.id = 'locToast'; t.className = 'loc-toast'; document.body.appendChild(t); }
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+  }
   </script>
 
 </body>
