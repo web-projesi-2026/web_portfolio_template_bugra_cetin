@@ -622,6 +622,21 @@ footer { padding: 64px; border-top: 1px solid var(--border); display: flex; just
   body { background: white; color: black; cursor: auto; }
 }
 
+.loc-city-filter {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.loc-city-filter:hover { border-color: var(--gold); color: var(--gold); }
+.loc-city-filter.active { border-color: var(--gold); color: var(--gold); background: rgba(212,168,67,0.08); }
+
 /* ── ARAMA & SIRALAMA ── */
 .search-sort-bar {
   display: flex;
