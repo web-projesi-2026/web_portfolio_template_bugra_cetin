@@ -178,6 +178,13 @@
           <button class="loc-filter" data-filter="Portre">Portre</button>
           <button class="loc-filter" data-filter="Otomobil Çekimi">Otomobil</button>
         </div>
+        <div class="loc-filter-group" id="cityFilters">
+          <button class="loc-city-filter active" data-city="all">Tüm Şehirler</button>
+          <button class="loc-city-filter" data-city="Ankara">Ankara</button>
+          <button class="loc-city-filter" data-city="İstanbul">İstanbul</button>
+          <button class="loc-city-filter" data-city="İzmir">İzmir</button>
+          <button class="loc-city-filter" data-city="Kırşehir">Kırşehir</button>
+        </div>
         <button class="favorites-toggle" id="favToggle">
           <span class="fav-icon">♥</span>
           <span id="favCount">0</span> Favori
@@ -626,6 +633,7 @@
       var FAVS_KEY = 'dmc_favorites';
       var showOnlyFavs = false;
       var currentFilter = 'all';
+      var currentCity = 'all';
       var searchQuery = '';
       var sortMode = 'default';
       window.allLocations = [];
@@ -656,7 +664,12 @@
         div.className = 'loc-card reveal';
         div.dataset.category = loc.category;
         div.dataset.id = loc.id;
-        var userBadge = loc.isUserAdded ? '<span style="font-family:var(--font-mono);font-size:8px;color:var(--accent);letter-spacing:0.1em;display:block;margin-top:4px">+ ' + (loc.addedBy||'Kullanıcı') + ' tarafından eklendi</span>' : '';
+        var userBadge = loc.isUserAdded
+          ? '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">' +
+              '<span style="font-family:var(--font-mono);font-size:8px;color:var(--accent);letter-spacing:0.1em">+ ' + (loc.addedBy||'Kullanıcı') + ' tarafından eklendi</span>' +
+              '<button class="delete-btn" data-id="' + loc.id + '" style="font-family:var(--font-mono);font-size:9px;color:#c04040;background:none;border:1px solid rgba(192,64,64,0.3);padding:3px 10px;cursor:pointer;letter-spacing:0.1em;transition:all 0.2s" onmouseover="this.style.background=\'rgba(192,64,64,0.1)\'" onmouseout="this.style.background=\'none\'">✕ Sil</button>' +
+            '</div>'
+          : '';
         div.innerHTML =
           '<div class="loc-card-top">' +
             '<div class="loc-emoji">' + loc.image + '</div>' +
@@ -685,6 +698,7 @@
         var favs = getFavs();
         var filtered = window.allLocations.filter(function(loc) {
           var catOk  = currentFilter === 'all' || loc.category === currentFilter;
+          var cityOk = currentCity === 'all' || loc.city === currentCity;
           var favOk  = !showOnlyFavs || favs.indexOf(loc.id) !== -1;
           var q      = searchQuery.toLowerCase();
           var searchOk = !q ||
@@ -692,7 +706,7 @@
             (loc.description && loc.description.toLowerCase().indexOf(q) !== -1) ||
             (loc.tags && loc.tags.some(function(t){ return t.toLowerCase().indexOf(q) !== -1; })) ||
             (loc.city && loc.city.toLowerCase().indexOf(q) !== -1);
-          return catOk && favOk && searchOk;
+          return catOk && cityOk && favOk && searchOk;
         });
 
         // SIRALAMA
@@ -736,7 +750,31 @@
             if (showOnlyFavs) window.renderCards();
           });
         });
+
+        // SİLME butonları
+        grid.querySelectorAll('.delete-btn').forEach(function(btn) {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var id = parseInt(btn.dataset.id);
+            if (!confirm('Bu lokasyonu silmek istediğine emin misin?')) return;
+            var userLocs = getUserLocations().filter(function(l){ return l.id !== id; });
+            saveUserLocations(userLocs);
+            window.allLocations = window.baseLocations.concat(getUserLocations());
+            window.renderCards();
+            showToast('🗑 Lokasyon silindi.');
+          });
+        });
       };
+
+      /* Şehir filtreleme */
+      document.querySelectorAll('.loc-city-filter').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.loc-city-filter').forEach(function(b){ b.classList.remove('active'); });
+          btn.classList.add('active');
+          currentCity = btn.dataset.city;
+          window.renderCards();
+        });
+      });
 
       /* Kategori filtreleme */
       document.querySelectorAll('.loc-filter').forEach(function(btn) {
